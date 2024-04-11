@@ -14,18 +14,15 @@ Le wrapper utilise les informations de latitude, longitude et la clé API fourni
 
 ## 3. Création de l'image Docker et dépôt sur le Hub
    Création de l'image Docker:
-    ```bash
-      docker build -t weatherapicall:20221199 .
+    ```bash docker build -t weatherapicall:20221199 .
     ```
 
    Tag de l'image:
-    ```bash
-       docker tag weatherapicall baltasarbn6/weatherapicall:20221199
+    ```bash docker tag weatherapicall baltasarbn6/weatherapicall:20221199
     ```
 
    Push de l'image vers Docker Hub:
-    ```bash
-       docker push baltasarbn6/weatherapicall:20221199
+    ```bash docker push baltasarbn6/weatherapicall:20221199
     ```
 
 ## 4. Récupérer et tester l'image : 
@@ -41,6 +38,7 @@ On peut tester l'appel API avec cette commande (et en renseignant sa propre clé
    ```
 
 Sécurité de l'image avec Trivy:
+
 Windows :
 ```bash
 docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image weatherapicall:20221199

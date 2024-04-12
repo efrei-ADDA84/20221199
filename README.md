@@ -16,23 +16,31 @@ Docker est utilisé pour isoler l'application et ses dépendances, assurant une 
 Le wrapper initial a été transformé en une API Flask pour permettre une interaction plus flexible avec les données météorologiques. Les principales modifications incluent :
 
 Utilisation du framework Flask pour créer une application web.
+
 Définition d'une route /weather qui accepte des requêtes GET avec des paramètres de latitude et de longitude.
+
 Utilisation de l'environnement pour récupérer la clé API.
+
 Interrogation de l'API OpenWeather pour récupérer les données météorologiques en fonction des paramètres de localisation.
+
 Réponse formatée en JSON contenant les informations météorologiques.
 
 ## 3. Modification du Dockerfile
 Le Dockerfile initial a été ajusté pour prendre en compte les nouvelles dépendances nécessaires à l'exécution de l'API Flask. Les principales modifications incluent :
 
 Installation des dépendances Flask et Werkzeug en plus de la dépendance Requests.
+
 Utilisation du fichier requirements.txt pour spécifier les dépendances Python.
 
 ## 4. Configuration du workflow GitHub Action
 Le workflow GitHub Action a été configuré pour automatiser le processus de construction et de publication de l'image Docker sur Docker Hub à chaque nouveau commit sur la branche principale (main). Voici les principales configurations :
 
 Utilisation d'un workflow déclenché par les événements de push sur la branche main et les pull requests vers la branche main.
+
 Définition de deux jobs : "lint" pour la validation du Dockerfile avec Hadolint, et "build" pour la construction et la publication de l'image Docker.
+
 Utilisation des secrets GitHub pour stocker les informations sensibles, telles que les identifiants Docker Hub (DOCKERHUB_USERNAME et DOCKERHUB_PASSWORD).
+
 Cette approche garantit que les informations sensibles ne sont pas exposées dans le fichier de configuration du workflow, assurant ainsi la sécurité des identifiants utilisés pour accéder à Docker Hub lors du processus de publication de l'image Docker.
 
 ## 5. Publication sur Docker Hub
@@ -44,6 +52,7 @@ L'image Docker contenant l'API météorologique est publiée automatiquement sur
    docker pull baltasarbn6/weatherapi
    ```
    Exécution de l'image Docker en spécifiant la clé API :
+   
    Windows : 
    ```bash
    docker run -p 8081:8081 --env API_KEY='your_api_key' baltasarbn6/weatherapi

@@ -1,11 +1,11 @@
 from flask import Flask, jsonify, request
 import os
 import requests
-from prometheus_client import Counter, start_http_server
+from prometheus_client import Counter, generate_latest, start_http_server
 
 app = Flask(__name__)
 
-REQUESTS = Counter('weather_requests_total', 'Total weather Requests')
+REQUESTS = Counter('weather_requests_total', 'Total des requêtes météo')
 
 @app.route('/weather', methods=['GET'])
 def fetch_weather():
@@ -28,14 +28,18 @@ def fetch_weather():
         humidity = data['main']['humidity']
 
         return jsonify({
-            "city": city,
-            "weather": weather_description,
-            "temperature": temperature,
-            "wind_speed": wind_speed,
-            "humidity": humidity
+            "ville": city,
+            "météo": weather_description,
+            "température": temperature,
+            "vitesse_vent": wind_speed,
+            "humidité": humidity
         })
     else:
-        return jsonify({"error": "Failed to fetch weather data"}), 400
+        return jsonify({"erreur": "Échec de récupération des données météo"}), 400
+
+@app.route('/metrics')
+def metrics():
+    return generate_latest()
 
 if __name__ == "__main__":
     start_http_server(8000)

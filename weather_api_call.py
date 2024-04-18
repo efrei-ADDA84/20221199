@@ -1,10 +1,13 @@
 from flask import Flask, jsonify, request
 import os
 import requests
+from prometheus_flask_exporter import PrometheusMetrics
 
 app = Flask(__name__)
+metrics = PrometheusMetrics(app)
 
 @app.route('/weather', methods=['GET'])
+@metrics.counter('weather_requests_total', 'Total weather Requests')
 def fetch_weather():
     latitude = request.args.get('lat')
     longitude = request.args.get('lon')

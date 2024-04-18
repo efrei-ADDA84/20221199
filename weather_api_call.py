@@ -1,15 +1,17 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, Response
+from prometheus_client import Counter, generate_latest, CONTENT_TYPE_LATEST
 import os
 import requests
-from prometheus_client import Counter, generate_latest, start_http_server
 
 app = Flask(__name__)
 
-REQUESTS = Counter('weather_requests_total', 'Total des requêtes météo')
+# Créer un compteur Prometheus
+REQUESTS_COUNTER = Counter('requests_total', 'Total number of HTTP requests')
 
 @app.route('/weather', methods=['GET'])
 def fetch_weather():
-    REQUESTS.inc()
+    # Incrémenter le compteur à chaque requête
+    REQUESTS_COUNTER.inc()
 
     latitude = request.args.get('lat')
     longitude = request.args.get('lon')
@@ -28,19 +30,19 @@ def fetch_weather():
         humidity = data['main']['humidity']
 
         return jsonify({
-            "ville": city,
-            "météo": weather_description,
-            "température": temperature,
-            "vitesse_vent": wind_speed,
-            "humidité": humidity
+            "city": city,
+            "weather": weather_description,
+            "temperature": temperature,
+            "wind_speed": wind_speed,
+            "humidity": humidity
         })
     else:
-        return jsonify({"erreur": "Échec de récupération des données météo"}), 400
+        return jsonify({"error": "Failed to fetch weather data"}), 400
 
-@app.route('/metrics')
+@app.route('/metrics', methods=['GET'])
 def metrics():
-    return generate_latest()
+    # Générer les dernières métriques
+    return Response(generate_latest(), mimetype=CONTENT_TYPE_LATEST)
 
 if __name__ == "__main__":
-    start_http_server(8000)
     app.run(host='0.0.0.0', port=80)

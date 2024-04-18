@@ -5,12 +5,10 @@ import requests
 
 app = Flask(__name__)
 
-# Créer un compteur Prometheus
 REQUESTS_COUNTER = Counter('requests_total', 'Total number of HTTP requests')
 
 @app.route('/weather', methods=['GET'])
 def fetch_weather():
-    # Incrémenter le compteur à chaque requête
     REQUESTS_COUNTER.inc()
 
     latitude = request.args.get('lat')
@@ -41,7 +39,6 @@ def fetch_weather():
 
 @app.route('/metrics', methods=['GET'])
 def metrics():
-    # Générer les dernières métriques
     return Response(generate_latest(), mimetype=CONTENT_TYPE_LATEST)
 
 if __name__ == "__main__":

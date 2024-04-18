@@ -1,4 +1,4 @@
-name: CI Docker and ACR Images
+name: CI Docker and ACR Image
 
 on:
   push:
@@ -25,14 +25,13 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Build the Docker image
-        run: docker build -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/20221199:v1 .
+        run: docker build -t baltasarbn6/weatherapi:latest .
       
       - name: Log in to Docker Hub
         run: echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login --username ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
 
       - name: Push Docker image to Docker Hub
-        run: docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/20221199:v1
-
+        run: docker push baltasarbn6/weatherapi:latest
 
       - name: Log in to Azure Container Registry
         run: echo ${{ secrets.REGISTRY_PASSWORD }} | docker login ${{ secrets.REGISTRY_LOGIN_SERVER }} --username ${{ secrets.REGISTRY_USERNAME }} --password-stdin

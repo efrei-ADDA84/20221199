@@ -1,4 +1,4 @@
-name: CI Docker Image
+name: CI Docker and ACR Images
 
 on:
   push:
@@ -12,25 +12,42 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    - name: Run Hadolint
-      run: |
-        docker run --rm -i hadolint/hadolint < Dockerfile
+      - name: Run Hadolint
+        run: |
+          docker run --rm -i hadolint/hadolint < Dockerfile
 
   build:
-
     needs: lint
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Build the Docker image
-      run: docker build -t baltasarbn6/weatherapi:latest .
+      - uses: actions/checkout@v3
+      - name: Build the Docker image
+        run: docker build -t baltasarbn6/weatherapi:latest .
       
-    - name: Log in to Docker Hub
-      run: echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login --username ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+      - name: Log in to Docker Hub
+        run: echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login --username ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
 
-    - name: Push Docker image to Docker Hub
-      run: docker push baltasarbn6/weatherapi:latest
+      - name: Push Docker image to Docker Hub
+        run: docker push baltasarbn6/weatherapi:latest
 
+      - name: Log in to Azure Container Registry
+        run: echo ${{ secrets.REGISTRY_PASSWORD }} | docker login ${{ secrets.REGISTRY_LOGIN_SERVER }} --username ${{ secrets.REGISTRY_USERNAME }} --password-stdin
+
+      - name: Push Docker image to Azure Container Registry
+        run: docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/20221199:v1
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy to Azure Container Instance
+        run: |
+          az container create --resource-group ${{ secrets.RESOURCE_GROUP }} --name 20221199 --image ${{ secrets.REGISTRY_LOGIN_SERVER }}/20221199:v1 --dns-name-label devops-20221199 --location francecentral

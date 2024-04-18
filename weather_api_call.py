@@ -1,14 +1,16 @@
 from flask import Flask, jsonify, request
 import os
 import requests
-from prometheus_flask_exporter import PrometheusMetrics
+from prometheus_client import Counter, start_http_server
 
 app = Flask(__name__)
-metrics = PrometheusMetrics(app)
+
+REQUESTS = Counter('weather_requests_total', 'Total weather Requests')
 
 @app.route('/weather', methods=['GET'])
-@metrics.counter('weather_requests_total', 'Total weather Requests')
 def fetch_weather():
+    REQUESTS.inc()
+
     latitude = request.args.get('lat')
     longitude = request.args.get('lon')
     api_key = os.environ.get('API_KEY')
@@ -25,7 +27,6 @@ def fetch_weather():
         wind_speed = data['wind']['speed']
         humidity = data['main']['humidity']
 
-        
         return jsonify({
             "city": city,
             "weather": weather_description,
@@ -37,4 +38,5 @@ def fetch_weather():
         return jsonify({"error": "Failed to fetch weather data"}), 400
 
 if __name__ == "__main__":
+    start_http_server(8000)
     app.run(host='0.0.0.0', port=80)

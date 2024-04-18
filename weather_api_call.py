@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 REQUESTS_COUNTER = Counter('requests_total', 'Total number of HTTP requests')
 
-@app.route('/', methods=['GET'])
+@app.route('/weather', methods=['GET'])
 def fetch_weather():
     REQUESTS_COUNTER.inc()
 

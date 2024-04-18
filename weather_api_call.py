@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 REQUESTS_COUNTER = Counter('requests_total', 'Total number of HTTP requests')
 
-@app.route('/weather', methods=['GET'])
+@app.route('/', methods=['GET'])
 def fetch_weather():
     REQUESTS_COUNTER.inc()
 
@@ -37,9 +37,9 @@ def fetch_weather():
     else:
         return jsonify({"error": "Failed to fetch weather data"}), 400
 
-@app.route('/metrics', methods=['GET'])
+@app.route('/metrics')
 def metrics():
-    return Response(generate_latest(), mimetype=CONTENT_TYPE_LATEST)
+    return generate_latest(), 200, {'Content-Type': CONTENT_TYPE_LATEST}
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=80)

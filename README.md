@@ -27,7 +27,7 @@ L'image Docker contenant l'API météorologique est automatiquement déployée v
 ## 3. Test de l'API
    Une fois l'image déployée sur Azure, on peut tester l'API via ce curl dans le terminal :
    ```bash
-   curl "http://devops-20221199.germanynorth.azurecontainer.io/weather?lat=10.902785&lon=44.754175"
+   curl "http://devops-20221199.germanynorth.azurecontainer.io/?lat=10.902785&lon=44.754175"
    ```
 ## 4. Ajout de métriques avec Prometheus
 Une nouvelle fonctionnalité a été ajoutée pour surveiller les performances de l'API à l'aide de Prometheus. Les métriques incluent le nombre total de requêtes HTTP reçues. Cela permet de surveiller et de diagnostiquer les performances de l'API en temps réel.

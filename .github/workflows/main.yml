@@ -50,4 +50,4 @@ jobs:
 
       - name: Deploy to Azure Container Instance
         run: |
-          az container create --resource-group ${{ secrets.RESOURCE_GROUP }} --name 20221199 --image baltasarbn6/20221199 --dns-name-label devops-20221199 --location germanynorth --registry-username ${{ secrets.REGISTRY_USERNAME }} --registry-password ${{ secrets.REGISTRY_PASSWORD }} --secure-environment-variables API_KEY=${{ secrets.API_KEY }}
+          az container create --resource-group ${{ secrets.RESOURCE_GROUP }} --name 20221199 --image baltasarbn6/20221199 --dns-name-label devops-20221199 --location germanynorth --registry-username ${{ secrets.REGISTRY_USERNAME }} --registry-password ${{ secrets.REGISTRY_PASSWORD }} --secure-environment-variables API_KEY=${{ secrets.API_KEY }} --ports: 8080

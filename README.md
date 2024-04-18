@@ -53,11 +53,11 @@ Cette commande déploie l'API météorologique sur Azure Container Instance. Ell
    curl "http://devops-20221199.germanynorth.azurecontainer.io:8080/?lat=10.902785&lon=44.754175"
    ```
 ## 5. Ajout de métriques avec Prometheus
-Une nouvelle fonctionnalité a été ajoutée pour surveiller les performances de l'API à l'aide de Prometheus. L'endpoint ```bash /metrics``` expose des métriques comme le nombre total de requêtes HTTP reçues, la consommation de mémoire ou encore l'utilisation du CPU. Cela permet de surveiller et de diagnostiquer les performances de l'API en temps réel. En surveillant ces métriques, onpeut avoir une vision claire des performances de l'API et prendre des mesures appropriées pour optimiser son fonctionnement et assurer sa disponibilité et sa fiabilité.
+Une nouvelle fonctionnalité a été ajoutée pour surveiller les performances de l'API à l'aide de Prometheus. L'endpoint ```/metrics``` expose des métriques comme le nombre total de requêtes HTTP reçues, la consommation de mémoire ou encore l'utilisation du CPU. Cela permet de surveiller et de diagnostiquer les performances de l'API en temps réel. En surveillant ces métriques, onpeut avoir une vision claire des performances de l'API et prendre des mesures appropriées pour optimiser son fonctionnement et assurer sa disponibilité et sa fiabilité.
 
 Voici la commande : 
 
    ```bash
-   curl "http://devops-20220004.francecentral.azurecontainer.io:8081/metrics
+   curl "http://devops-20221199.germanynorth.azurecontainer.io:8080/metrics
    ```
 

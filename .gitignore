@@ -1,9 +1,0 @@
-# Fichiers d'état de Terraform
-terraform.tfstate
-terraform.tfstate.backup
-
-# Fichier de verrouillage de Terraform
-.terraform.lock.hcl
-
-# Dossier de Terraform
-.terraform/

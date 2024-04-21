@@ -67,21 +67,20 @@ terraform output private_key_pem
 ```
 
 ## 8. Connexion à la machine virtuelle
-Pour se connecter à la machine virtuelle après son déploiement, on récupère l'adresse IP publique. Cette adresse sera affichée dans le résumé des ressources créées ou alors disponible sur Azure dans les propriétés de la ressource créée. Ensuite, on utilise la commande SSH suivante en spécifiant le chemin vers la clé privée (-i) et l'utilisateur administrateur de la machine virtuelle (devops). Remplacez 52.143.143.48 par l'adresse IP publique de votre machine virtuelle : 
+Pour se connecter à la machine virtuelle après son déploiement, on récupère l'adresse IP publique. Cette adresse sera affichée dans le résumé des ressources créées ou alors disponible sur Azure dans les propriétés de la ressource créée. Ensuite, on utilise la commande SSH suivante en spécifiant le chemin vers la clé privée (-i) et l'utilisateur administrateur de la machine virtuelle (devops). On remplace 40.89.183.73 par l'adresse IP publique de notre machine virtuelle : 
 ```bash
-ssh -i id_rsa devops@52.143.143.48
+ssh -i id_rsa devops@40.89.183.73
 ```
 Ceci vous connectera à la VM en local.
+
+![Connexion à la VM](images/c1.JPG)
 
 ## 9. Commande pour la notation
 
 ```bash
-ssh -i id_rsa devops@52.143.143.48
+ssh -i id_rsa devops@40.89.183.73
 ```
-
-
-
-
+![Commande notée](images/c3.JPG)
 
 ## 10. Nettoyage des ressources
 On peut supprimer toutes les ressources déployées en exécutant la commande : 
@@ -104,7 +103,7 @@ custom_data = base64encode(<<-EOF
                 EOF
   )
 ```
-
+![Docker sur la VM](images/c2.JPG)
 
 ### 2. Élimination de la duplication de code grâce à l'utilisation de variables
 Je me concentre sur la réduction de la duplication de code en utilisant des variables Terraform. Plutôt que de répéter les mêmes valeurs à plusieurs endroits dans ma configuration, je centralise ces valeurs dans des variables que je référence ensuite dans tout mon code. Cette approche rend mon code plus concis, plus lisible et plus facile à maintenir.

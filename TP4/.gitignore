@@ -7,3 +7,5 @@ terraform.tfstate.backup
 
 # Dossier de Terraform
 .terraform/
+
+*.pem

@@ -1,63 +1,113 @@
-# README - TP3
+# README - TP4 - Création d'une machine virtuelle Azure avec Terraform
 
-Ce rapport présente les évolutions apportées au projet depuis la version précédente, à savoir la configuration du déploiement vers Azure Container Instance et l'ajout de métriques avec Prometheus.
+Dans ce TP, l'objectif est de créer une machine virtuelle (VM) Azure avec une adresse IP publique dans un réseau existant à l'aide de Terraform. On cherche à se connecter à la VM via SSH et comprendre les différences entre les services Azure Container Instances (ACI) et Azure Virtual Machines (AVM).
 
-## 1. Choix techniques
-### Langage de programmation : 
-Python.
+## 1. Choix technique
+Terraform : Terraform est un outil open-source qui permet de gérer l'infrastructure de manière code, en utilisant une approche déclarative. Il permet aux équipes de décrire leur infrastructure cloud dans des fichiers de configuration simples et lisibles, offrant ainsi la possibilité de provisionner et de gérer des ressources sur divers fournisseurs cloud, tout en garantissant la reproductibilité, la cohérence et la facilité de gestion des environnements.
 
-### Framework web :
-Flask.
+## 2. Installation de terraform
+Pour débuter, j'ai installé Terraform sur mon environnement local, suivant les instructions spécifiques à mon système d'exploitation.
 
-### Conteneurisation : 
-Docker est utilisé pour isoler l'application et ses dépendances, assurant une portabilité et une gestion simplifiée de l'environnement d'exécution.
+## 3. Connexion à Azure
+J'ai initié la connexion à Azure en utilisant la commande ```az login``` dans mon terminal. Cette commande m'a permis de m'authentifier auprès de mon compte Azure et d'établir une session de travail valide, ce qui est essentiel pour que Terraform puisse interagir avec les services Azure lors du déploiement de l'infrastructure. Une fois cette configuration effectuée, j'ai pu entamer la création de mon infrastructure cloud via Terraform.
 
-## 2. Configuration du workflow GitHub Action pour Azure
-Le workflow GitHub Action a été étendu pour inclure le déploiement vers Azure Container Instance en plus de la publication sur Docker Hub.
-Voici les principales modifications :
+## 4. Configuration de l'infrastructure
+Pour déployer mon infrastructure Azure avec Terraform, j'ai d'abord configuré les fichiers Terraform (selon les contraintes) nécessaires pour décrire mon environnement cloud. Voici une explication détaillée de chaque fichier et de son rôle dans le processus de déploiement :
 
-Ajout du push de l'image Docker vers Azure Container Registry.
+### main.tf : 
+Configure le fournisseur AzureRM pour utiliser l'abonnement Azure spécifié. La ligne ```subscription_id = var.subscription_id``` définit l'ID de l'abonnement à utiliser, tandis que ```skip_provider_registration = true désactive``` l'enregistrement automatique du fournisseur dans Azure. Cela permet à Terraform d'interagir avec les ressources Azure lors du déploiement de l'infrastructure.
 
-Ajout d'un nouveau job "deploy" pour déployer l'image Docker vers Azure Container Instance.
+### variables.tf : 
+Ce fichier définit des variables utilisées dans notre configuration Terraform pour paramétrer l'infrastructure Azure. Chaque variable est décrite par sa fonction, son type et sa valeur par défaut. 
 
-Utilisation des secrets GitHub pour stocker les informations sensibles nécessaires au déploiement vers Azure Container Registry, telles que les informations d'identification et les variables d'environnement sécurisées (clé API).
+### virtual_machine.tf : 
+Ce bloc de configuration spécifie les détails nécessaires pour créer et configurer une machine virtuelle Linux dans Azure, en incluant des paramètres tels que la localisation, la taille, le système d'exploitation, et les configurations d'authentification.
 
-L'image Docker contenant l'API météorologique est automatiquement déployée vers Azure Container Instance après chaque nouveau commit sur la branche principale.
+### data.tf : 
+Ce fichier permet à Terraform de récupérer les détails du réseau virtuel et du sous-réseau existants dans Azure, afin de les utiliser dans la configuration de notre infrastructure sans avoir besoin de les recréer manuellement.
 
-## 3. Focus sur le déploiement sur Azure
-Pour déployer sur Azure, le worflow suit les étapes suivantes :
+### network.tf : 
+Ce fichier permet de créer une interface réseau avec une adresse IP publique dans Azure. L'interface réseau est configurée pour être attachée à un sous-réseau spécifié, avec une adresse IP privée allouée dynamiquement, et une adresse IP publique associée pour permettre l'accès depuis Internet.
 
-Connexion à Azure Container Registry (ACR) en utilisant les informations d'identification stockées dans les secrets GitHub : 
+
+Les contraintes spécifiées ont été rigoureusement respectées lors du déploiement de l'infrastructure Azure avec Terraform. En respectant ces contraintes, l'infrastructure déployée est alignée sur les normes et les spécifications requises pour le projet. Je rappelle les essentielles ici : 
+* Location : france central
+* VM size : Standard_D2s_v3
+* User administrateur de la VM : devops
+* OS : Ubuntu 22.04
+* Network : network-tp4
+* Subnet : internal
+
+
+## 5. Création de la clef SSH avec Terraform avec ```ssh.tf```
+Dans cette section, j'utilise Terraform pour générer une paire de clés SSH privée/publique. Tout d'abord, on définit la ressource tls_private_key, spécifiant l'algorithme RSA et une longueur de clé de 4096 bits. Ensuite, on a deux sorties pour récupérer les clés générées. L'output private_key_pem contient la clé privée au format PEM, tandis que l'output public_key_openssh contient la clé publique au format OpenSSH. Ces clés peuvent ensuite être utilisées pour l'authentification SSH lors de la configuration et de la gestion des ressources dans mon infrastructure.
+
+## 6. Déploiement de l'infrastructure
+
+### Initialisation du répertoire Terraform
+Dans le répertoire contenant mes fichiers Terraform, je lance la commande suivante pour initialiser le répertoire et télécharger les plugins nécessaires :
 ```bash
-- name: Log in to Azure Container Registry
-        run: echo ${{ secrets.REGISTRY_PASSWORD }} | docker login ${{ secrets.REGISTRY_LOGIN_SERVER }} --username ${{ secrets.REGISTRY_USERNAME }} --password-stdin
+terraform init
+```
+### Vérification de la planification
+J'utilise la commande suivante pour vérifier les changements proposés par Terraform. Je m'assure que les ressources qui seront créées correspondent à mes attentes et respectent les contraintes spécifiées.
+```bash
+terraform plan
+``` 
+### Application des changements et déploiement de l'infrastructure
+Si la planification est conforme à mes attentes, je lance la commande suivante pour appliquer les changements et déployer l'infrastructure Azure : (Terraform demandera de confirmer l'application des changements avant de procéder) : 
+```bash
+terraform apply
 ```
 
-Poussée de l'image vers Azure : 
+## 7. Récupération de la clé privée
+On exécute la commande suivante pour afficher la sortie de la clé privée SSH générée dans le fichier Terraform et l'enregistrer localement pour se connecter à la VM : 
 ```bash
-- name: Push Docker image to Azure Container Registry
-        run: docker push baltasarbn6/20221199
+terraform output private_key_pem
 ```
 
-Déploiement sur Azure : 
+## 8. Connexion à la machine virtuelle
+Pour se connecter à la machine virtuelle après son déploiement, on récupère l'adresse IP publique. Cette adresse sera affichée dans le résumé des ressources créées ou alors disponible sur Azure dans les propriétés de la ressource créée. Ensuite, on utilise la commande SSH suivante en spécifiant le chemin vers la clé privée (-i) et l'utilisateur administrateur de la machine virtuelle (devops). Remplacez 52.143.143.48 par l'adresse IP publique de votre machine virtuelle : 
 ```bash
-- name: Deploy to Azure Container Instance
-        run: |
-          az container create --resource-group ${{ secrets.RESOURCE_GROUP }} --name 20221199 --image baltasarbn6/20221199 --dns-name-label devops-20221199 --location germanynorth --registry-username ${{ secrets.REGISTRY_USERNAME }} --registry-password ${{ secrets.REGISTRY_PASSWORD }} --secure-environment-variables API_KEY=${{ secrets.API_KEY }} --ports 8080
+ssh -i id_rsa devops@52.143.143.48
 ```
-Cette commande déploie l'API météorologique sur Azure Container Instance. Elle crée une instance de conteneur dans le groupe de ressources spécifié, en utilisant l'image Docker poussée vers le registre de conteneurs Azure. Les secrets GitHub sont utilisés pour récupérer les informations d'identification nécessaires au déploiement.
+Ceci vous connectera à la VM en local.
 
-## 4. Test de l'API
-   Une fois l'image déployée sur Azure, on peut tester l'API via ce curl dans le terminal, en choisissant sa longitude et sa latitude :
-   ```bash
-   curl "http://devops-20221199.germanynorth.azurecontainer.io:8080/?lat=10.902785&lon=44.754175"
-   ```
-## 5. Ajout de métriques avec Prometheus
-Une nouvelle fonctionnalité a été ajoutée pour surveiller les performances de l'API à l'aide de Prometheus. L'endpoint ```/metrics``` expose des métriques comme le nombre total de requêtes HTTP reçues, la consommation de mémoire ou encore l'utilisation du CPU. Cela permet de surveiller et de diagnostiquer les performances de l'API en temps réel. En surveillant ces métriques, onpeut avoir une vision claire des performances de l'API et prendre des mesures appropriées pour optimiser son fonctionnement et assurer sa disponibilité et sa fiabilité.
+## 9. Commande pour la notation
 
-Voici la commande : 
+```bash
+ssh -i id_rsa devops@52.143.143.48
+```
 
-   ```bash
-   curl "http://devops-20221199.germanynorth.azurecontainer.io:8080/metrics
-   ```
 
+
+
+
+## 10. Nettoyage des ressources
+On peut supprimer toutes les ressources déployées en exécutant la commande : 
+```bash
+terraform destroy
+```
+
+## 10. Bonus
+### 1. Installation de Docker avec Cloud-init
+Dans cette tâche supplémentaire, j'automatise l'installation de Docker dès le démarrage de ma machine virtuelle en utilisant Cloud-init.
+```bash
+custom_data = base64encode(<<-EOF
+                #!/bin/bash
+                sudo apt-get update
+                sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+                curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+                sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+                sudo apt-get update
+                sudo apt-get install -y docker-ce
+                EOF
+  )
+```
+
+
+### 2. Élimination de la duplication de code grâce à l'utilisation de variables
+Je me concentre sur la réduction de la duplication de code en utilisant des variables Terraform. Plutôt que de répéter les mêmes valeurs à plusieurs endroits dans ma configuration, je centralise ces valeurs dans des variables que je référence ensuite dans tout mon code. Cette approche rend mon code plus concis, plus lisible et plus facile à maintenir.
+
+### 3. Formatage correct du code Terraform
+Je veille à maintenir une présentation uniforme et lisible de mon code Terraform en utilisant la commande ```terraform fmt```. Cette commande me permet de formater automatiquement mon code selon des conventions prédéfinies, favorisant ainsi la cohérence et facilitant la collaboration au sein d'une équipe.

@@ -39,7 +39,7 @@ Les contraintes spécifiées ont été rigoureusement respectées lors du déplo
 * Subnet : internal
 
 
-## 5. Création de la clef SSH avec Terraform avec ```ssh.tf```
+## 5. Création de la clé SSH avec Terraform avec ```ssh.tf```
 Dans cette section, j'utilise Terraform pour générer une paire de clés SSH privée/publique. Tout d'abord, on définit la ressource tls_private_key, spécifiant l'algorithme RSA et une longueur de clé de 4096 bits. Ensuite, on a deux sorties pour récupérer les clés générées. L'output private_key_pem contient la clé privée au format PEM, tandis que l'output public_key_openssh contient la clé publique au format OpenSSH. Ces clés peuvent ensuite être utilisées pour l'authentification SSH lors de la configuration et de la gestion des ressources dans mon infrastructure.
 
 ## 6. Déploiement de l'infrastructure
@@ -65,11 +65,12 @@ On exécute la commande suivante pour afficher la sortie de la clé privée SSH 
 ```bash
 terraform output private_key_pem
 ```
+Attention ! La clé privée change à chaque déploiement, il faut donc toujours la récupérer !
 
 ## 8. Connexion à la machine virtuelle
 Pour se connecter à la machine virtuelle après son déploiement, on récupère l'adresse IP publique. Cette adresse sera affichée dans le résumé des ressources créées ou alors disponible sur Azure dans les propriétés de la ressource créée. Ensuite, on utilise la commande SSH suivante en spécifiant le chemin vers la clé privée (-i) et l'utilisateur administrateur de la machine virtuelle (devops). On remplace 40.89.183.73 par l'adresse IP publique de notre machine virtuelle : 
 ```bash
-ssh -i id_rsa devops@40.89.183.73
+ssh -i ~\Desktop\devops\20221199\private_key.pem devops@40.89.183.73
 ```
 Ceci vous connectera à la VM en local.
 
@@ -78,7 +79,7 @@ Ceci vous connectera à la VM en local.
 ## 9. Commande pour la notation
 
 ```bash
-ssh -i id_rsa devops@40.89.183.73
+ssh -i ~\Desktop\devops\20221199\private_key.pem devops@40.89.183.73
 ```
 ![Commande notée](images/c3.JPG)
 

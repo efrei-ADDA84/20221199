@@ -1,9 +1,9 @@
 resource "azurerm_linux_virtual_machine" "main" {
-  name                = "devops-20221199"
-  location            = "francecentral"
-  resource_group_name = var.resource_group_name
+  name                  = "devops-20221199"
+  location              = "francecentral"
+  resource_group_name   = var.resource_group_name
   network_interface_ids = [azurerm_network_interface.main.id]
-  size                = "Standard_D2s_v3"
+  size                  = "Standard_D2s_v3"
 
   os_disk {
     caching              = "ReadWrite"
@@ -28,8 +28,8 @@ resource "azurerm_linux_virtual_machine" "main" {
     version   = "latest"
   }
 
-  computer_name  = "hostname"
-  admin_username = "devops"
+  computer_name                   = "hostname"
+  admin_username                  = "devops"
   disable_password_authentication = true
 
   admin_ssh_key {
